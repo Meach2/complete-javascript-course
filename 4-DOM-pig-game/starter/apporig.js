@@ -16,7 +16,6 @@ var winningScore = 100;
 
 document.querySelector('.btn-roll').addEventListener('click', rollDice);
 document.querySelector('.btn-new').addEventListener('click', init);
-document.querySelector('.btn-quit').addEventListener('click', quit);
 document.querySelector('.btn-hold').addEventListener('click', holdDice);
 
 function rollDice(){
@@ -28,6 +27,7 @@ function rollDice(){
   var lost = false;
   if(gamePlaying) {
     // 1. random number 1-6:
+       document.getElementById('winningNum').disabled = true;
       var dice = rollDie(1);
       var diceTwo = rollDie(2);
       console.log("Dice1:"+dice+" | Dice2:" + diceTwo);
@@ -60,7 +60,7 @@ function rollDice(){
   }
 }
 
-function rollDie(die){
+function rollDie(die) {
   var dice = Math.floor(Math.random() * 6) + 1;
   var diceDOM = document.querySelector('#dice-' + die);
   diceDOM.attributes.src.value = 'dice-' + dice + '.png';
@@ -68,7 +68,8 @@ function rollDie(die){
   diceDOM.style.display = 'block';
   getComputedStyle(diceDOM);
   return dice;
-}
+   }
+
 
 function holdDice(){
   if (gamePlaying) {
@@ -91,43 +92,32 @@ function winGame(){
     document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
     document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
     gamePlaying = false;
-    document.getElementById('winScore').disabled=false;
-    document.querySelector('.btn-new').style.display = 'block';
-    document.querySelector('.btn-quit').style.display = 'none';
-    document.querySelector('.btn-roll').style.display = 'none';
-    document.querySelector('.btn-hold').style.display = 'none';
+    document.getElementById('winningNum').disabled=false;
 }
 function endTurn(dieState){
   switch(dieState) {
     case 1:
         document.querySelector('#dice-1').classList.add('shaky');
-        animateDie();
+        hideDice();
+        nextPlayer();
         break;
     case 2:
         document.querySelector('#dice-2').classList.add('shaky');
-        animateDie();
+        hideDice();
+        nextPlayer();
         break;
     case 3:
       document.querySelector('#dice-1').classList.add('shaky');
       document.querySelector('#dice-2').classList.add('shaky');
-      animateDie();
+      hideDice();
+      nextPlayer();
       break;
     case 4:
-      animateDie();
+      hideDice();
+      nextPlayer();
     default:
         break;
   }
-}
-
-function animateDie(){
-  delay(200).then(() => {
-            return hideDice();
-        }).then(() => {
-            nextPlayer();
-        });
-}
-function delay(ms) {
-  return new Promise(function (resolve) { return setTimeout(resolve, ms); });
 }
 
 function hideDice(){
@@ -149,25 +139,18 @@ function nextPlayer() {
 };
 
 function init() {
-  reset();
-  document.querySelector('.btn-new').style.display = 'none';
-  document.querySelector('.btn-quit').style.display = 'block';
-  document.querySelector('.btn-roll').style.display = 'block';
-  document.querySelector('.btn-hold').style.display = 'block';
-  var winningNumInput = document.getElementById('winScore');
-  var winningNum = winningNumInput.value;
-  if(winningNum != ""){
-    winningScore = winningNum;
-    console.log("winningScore:"+winningScore);
-  }
-  winningNumInput.disabled=true;
-  gamePlaying = true;
-};
-
-function reset(){
   scores = [0, 0];
   roundScore = 0;
   activePlayer = 0;
+
+  var winningNumInput = document.getElementById('winScore');
+  var winningNum = winningNumInput.value;
+  if(winningNum){
+    winningScore = winningNum;
+  }
+  winningNumInput.disabled = false;
+  document.querySelector('.btn-roll').style.display = 'block';
+  document.querySelector('.btn-hold').style.display = 'block';
   document.querySelector('#dice-1').style.display = 'none';
   document.querySelector('#dice-2').style.display = 'none';
   document.getElementById('score-0').textContent = '0';
@@ -181,13 +164,6 @@ function reset(){
   document.querySelector('.player-0-panel').classList.remove('active');
   document.querySelector('.player-1-panel').classList.remove('active');
   document.querySelector('.player-0-panel').classList.add('active');
-}
-
-function quit(){
-  document.getElementById('winScore').disabled=false;
-  document.querySelector('.btn-roll').style.display = 'none';
-  document.querySelector('.btn-hold').style.display = 'none';
-  document.querySelector('.btn-new').style.display = 'block';
-  document.querySelector('.btn-quit').style.display = 'none';
-  reset();
-}
+  gamePlaying = true;
+};
+init();
